@@ -46,6 +46,9 @@ class TMDB{
 	#@var string url of API TMDB
 	const _API_URL_ = "http://api.themoviedb.org/3/";
 
+	#@var string url of secure API TMDB
+	const _SECURE_API_URL_ = "https://api.themoviedb.org/3/";
+
 	#@var string Version of this class
 	const VERSION = '0.0.3';
 
@@ -61,6 +64,9 @@ class TMDB{
 	#@var boolean for testing
 	private $_debug;
 
+	#@var boolean for secure api url
+	private $_secure;
+
 
 	/**
 	 * 	Construct Class
@@ -68,13 +74,15 @@ class TMDB{
 	 * 	@param string $apikey The API key token
 	 * 	@param string $lang The languaje to work with, default is english
 	 */
-	public function __construct($apikey, $lang = 'en', $debug = false) {
+	public function __construct($apikey, $lang = 'en', $debug = false, $secure = true) {
 
 		// Sets the API key
 		$this->setApikey($apikey);
 	
 		// Setting Language
 		$this->setLang($lang);
+
+		$this->setSecure($secure);
 
 		// Set the debug mode
 		$this->_debug = $debug;
@@ -130,6 +138,27 @@ class TMDB{
 	 */
 	public function getLang() {
 		return $this->_lang;
+	}
+
+	//------------------------------------------------------------------------------
+	// API URL
+	//------------------------------------------------------------------------------
+
+	/** 
+	 *  Set the api url to use ssl
+	 *
+	 * 	@param boolean $secure
+	 */
+	public function setSecure($secure = 'en') {
+		$this->_secure = $secure;
+	}
+
+	/**  
+	 *
+	 * 	@return boolean
+	 */
+	public function getSecure() {
+		return $this->_secure;
 	}
 
 	//------------------------------------------------------------------------------
@@ -201,8 +230,14 @@ class TMDB{
 	 * 	@return string
 	 */
 	private function _call($action, $appendToResponse){
+		
+		if($this->getSecure()){
+			$url = self::_SECURE_API_URL_;
+		}else{
+			$url = self::_API_URL_;
+		}
 
-		$url = self::_API_URL_.$action .'?api_key='. $this->getApikey() .'&language='. $this->getLang() .'&'.$appendToResponse;
+		$url .= $action .'?api_key='. $this->getApikey() .'&language='. $this->getLang() .'&'.$appendToResponse;
 
 		if ($this->_debug) {
 			echo '<pre><a href="' . $url . '">check request</a></pre>';
